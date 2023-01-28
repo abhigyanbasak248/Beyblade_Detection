@@ -39,21 +39,14 @@ def getContours(img,frame):
         area=cv.contourArea(cnt)
         if area>1700:
             x,y,w,h=cv.boundingRect(cnt)
-            cv.rectangle(frame,(x,y),(x+w+15,y+h+15),(255,255,255),2)  
+            if area>6100:
+                cv.rectangle(frame,(x,y),(x+w+15,y+h+15),(255,0,0),2)  
+            else:
+                cv.rectangle(frame,(x,y),(x+w+15,y+h+15),(0,255,0),2)
         cv.imshow('Contours',frame)
+    return frame
 
-# def getContours2(img,frame):
-#     contours,hierarchies=cv.findContours(img,cv.RETR_EXTERNAL,cv.CHAIN_APPROX_SIMPLE)
-#     blank=np.zeros(img.shape,dtype='uint8')
-#     for cnt in contours:
-#         cv.drawContours(blank,cnt,-1,(255,255,255),1)
-#         area=cv.contourArea(cnt)
-#         if area>1700:
-#             x,y,w,h=cv.boundingRect(cnt)
-#             cv.rectangle(frame,(x,y),(x+w+20,y+h+30),(255,255,255),2)
-#         # cv.imshow('Contours',frame)
-#     return frame
-
+out=cv.VideoWriter('output.avi',cv.VideoWriter_fourcc(*'MJPG'),10,(640,940))
 while True:
     ret,frame=cap.read()
     frame=frame[80:,150:1090]
@@ -69,18 +62,11 @@ while True:
     res=cv.bitwise_xor(imgRes1,imgRes2)
     kernel=np.ones((5,5),np.uint8)
     res=cv.dilate(res,kernel,iterations=3)
-    # res1=cv.dilate(imgRes1,kernel,iterations=3)
-    # res2=cv.dilate(imgRes2,kernel,iterations=3)
     imgCanny=cv.Canny(res,50,100)
-    # imgCanny1=cv.Canny(res1,50,100)
-    # imgCanny2=cv.Canny(res2,50,100)
-    # res=cv.bitwise_or(getContours1(imgCanny1,frame),getContours2(imgCanny2,frame))
-    # res=cv.bitwise_xor(frame,res)
-    getContours(imgCanny,frame)
-    # cv.imshow('frame',res)
-    # cv.imshow('result1',imgRes1)
-    # cv.imshow('result2',imgRes2)
+    # out.write(getContours(imgCanny,frame))
+    cv.imwrite('Output.png',getContours(imgCanny,frame))
     if cv.waitKey(1) & 0xFF==ord('q'):
         break
 cap.release()
+out.release()
 cv.destroyAllWindows()
